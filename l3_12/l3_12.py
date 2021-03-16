@@ -21,7 +21,7 @@ class Person(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(), nullable=False)
     email = db.Column(db.String(), unique=True)
-    age = db.Column(db.Integer, db.CheckConstraint('age>0'))
+    age = db.Column(db.Float, db.CheckConstraint('age>0'))
 
     # Define custom __repr__
     def __repr__(self):
@@ -32,7 +32,7 @@ db.drop_all()
 db.create_all()
 
 # Populate persons table with an entry
-person1 = Person(name='Alexander', email='alex@awesone.com')
+person1 = Person(name='Alexander', email='alex@awesone.com', age='35.0')
 db.session.add(person1)
 db.session.commit()
 
