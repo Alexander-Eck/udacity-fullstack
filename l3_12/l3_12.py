@@ -22,6 +22,7 @@ class Person(db.Model):
     name = db.Column(db.String(), nullable=False)
     email = db.Column(db.String(), unique=True)
 
+    # Define custom __repr__
     def __repr__(self):
         return '<Person> {name}, {email}'.format(name=self.name, email=self.email)
 
