@@ -31,7 +31,6 @@ db.create_all()
 
 # Populate persons table with an entry
 person1 = Person(name='Alexander', email='alex@awesone.com')
-print(person1)
 db.session.add(person1)
 db.session.commit()
 
