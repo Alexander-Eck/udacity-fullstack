@@ -25,4 +25,3 @@ conn.commit()
 # Close cursor and connection
 cur.close()
 conn.close()
- 
