@@ -21,6 +21,7 @@ class Person(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(), nullable=False)
     email = db.Column(db.String(), unique=True)
+    age = db.Column(db.Integer, db.CheckConstraint('age>0'))
 
     # Define custom __repr__
     def __repr__(self):
