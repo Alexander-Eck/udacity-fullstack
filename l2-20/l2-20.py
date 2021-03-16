@@ -49,7 +49,7 @@ result = cur.fetchall()
 for r in result:
     print(r)
 
-# Commit to transactoin
+# Commit to transaction
 conn.commit()
 
 # Close cursor and connection
