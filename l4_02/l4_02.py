@@ -52,23 +52,24 @@ for p in persons:
     db.session.add(Person(**p))
 db.session.commit()
 
+# Perform a few queries and collect results
+commands = (
+    'Person.query.all()',
+    'Person.query.count()',
+    'Person.query.limit(5).all()',
+    'Person.query.filter(Person.name.like("A%")).all()',
+    'Person.query.filter_by(name="Alexander").all()'        
+)
+results = ''
+for c in commands:
+    results += c + ': <br />'
+    results += str(eval(c))
+    results += '<br /><br />'
+
 # Route '/'
 @app.route('/')
 def index():
-    # Perform a few queries and return results
-    commands = (
-        'Person.query.all()',
-        'Person.query.count()',
-        'Person.query.limit(5).all()',
-        'Person.query.filter(Person.name.like("A%")).all()',
-        'Person.query.filter_by(name="Alexander").all()'        
-    )
-    results = ''
-    for c in commands:
-        results += c + ': <br />'
-        results += str(eval(c))
-        results += '<br /><br />'
-    return results
+        return results
 
 # Execute web server when run by interpreter
 if __name__ == '__main__':
