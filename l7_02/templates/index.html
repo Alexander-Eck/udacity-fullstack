@@ -1,0 +1,83 @@
+<html>
+    <head>
+        <title>Todo App</title>
+        <style>
+            #error-msg {
+                display: none;
+            }
+            ul {
+                list-style: none;
+                padding: 0;
+                margin: 10 0 10 0;
+            }
+        </style>
+    </head>
+    <body>
+        <ul id="todos">
+            {% for todo in todos %}
+            <li>
+                <input type="checkbox" class="completed"
+                    data-id="{{ todo.id }}"
+                    {% if todo.completed %}checked{% endif %} />
+                {{ todo.description }}
+            </li>
+            {% endfor %}
+        </ul>
+        <div>
+            <form id="form">
+                <label>Todo:
+                    <input required type="text" id="description" 
+                        name="description" minlength="3" />
+                </label>
+                <input type="submit" value="Add Todo" />
+            </form>
+        </div>
+        <div id="error-msg"></div>
+        <script>
+            checkboxes = document.querySelectorAll('.completed');
+            for (let i=0; i<checkboxes.length; i++) {
+                checkboxes[i].onchange = function(event) {
+                    todoId = event.target.dataset['id'];
+                    fetch('/todos/'+todoId+'/update/completed', {
+                        method: 'POST',
+                        headers: {'Content-Type':'application/json'},
+                        body: JSON.stringify({
+                            'completed':event.target.checked
+                        })
+                    })
+                    .catch(function(error) {
+                        error_div = document.getElementById('error-msg');
+                        error_div.style.display = "block";
+                        error_div.innerHTML = error;
+                    });
+                }
+            }
+            document.getElementById('form').onsubmit = function(event) {
+                event.preventDefault();
+                fetch('/todos/add', {
+                    method: 'POST',
+                    headers: {'Content-Type':'application/json'},
+                    body: JSON.stringify({
+                        'description':document.getElementById('description').value
+                    })
+                })
+                .then(function(response) {
+                    if(!response.ok) {
+                        throw Error(response.statusText);
+                    }
+                    return response.json();
+                })
+                .then(function(response) {
+                    const liItem = document.createElement('li');
+                    liItem.innerHTML = response['description'];
+                    document.getElementById('todos').appendChild(liItem);
+                })
+                .catch(function(error) {
+                    error_div = document.getElementById('error-msg');
+                    error_div.style.display = "block";
+                    error_div.innerHTML = error;
+                });
+            }
+        </script>
+    </body>
+</html>
