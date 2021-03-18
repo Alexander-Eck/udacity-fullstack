@@ -1,0 +1,50 @@
+<html>
+    <head>
+        <title>Todo App</title>
+    </head>
+    <body>
+        <ul id="todos">
+            {% for todo in todos %}
+            <li>{{ todo.description }}</li>
+            {% endfor %}
+        </ul>
+        <div>
+            <form id="form">
+                <label>Todo:
+                    <input required type="text" id="description" 
+                        name="description" minlength="3" />
+                </label>
+                <input type="submit" value="Add Todo" />
+            </form>
+        </div>
+        <div id="error" style="display: none;"></div>
+        <script>
+            document.getElementById('form').onsubmit = function(event) {
+                event.preventDefault();
+                fetch('/todos/add', {
+                    method: 'POST',
+                    headers: {'Content-Type':'application/json'},
+                    body: JSON.stringify({
+                        'description':document.getElementById('description').value
+                    })
+                })
+                .then(function(response) {
+                    if(!response.ok) {
+                        throw Error(response.statusText);
+                    }
+                    return response.json();
+                })
+                .then(function(response) {
+                    const liItem = document.createElement('li');
+                    liItem.innerHTML = response['description'];
+                    document.getElementById('todos').appendChild(liItem);
+                })
+                .catch(function(error) {
+                    error_div = document.getElementById('error');
+                    error_div.style.display = "block";
+                    error_div.innerHTML = error;
+                });
+            }
+        </script>
+    </body>
+</html>
