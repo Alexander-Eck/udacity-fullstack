@@ -68,7 +68,7 @@ def add():
     else:
         return abort(400)
 
-# Route '/todos/update/completed'
+# Route '/todos/<todo_id>/update/completed'
 @app.route('/todos/<todo_id>/update/completed', methods=['POST'])
 def update_completed(todo_id):
     success = True
