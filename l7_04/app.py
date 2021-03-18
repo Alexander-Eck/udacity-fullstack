@@ -65,8 +65,8 @@ def create():
     return json if success else abort(400)
 
 # Route to update completed attribute of a todo item
-@app.route('/todos/completed/<todo_id>', methods=['PUT'])
-def update_completed(todo_id):
+@app.route('/todos/<todo_id>/completed', methods=['PATCH'])
+def modify_completed(todo_id):
     success = True
     try:
         todo = Todo.query.get(todo_id)
@@ -78,7 +78,7 @@ def update_completed(todo_id):
         print(sys.exc_info())
     finally:
         db.session.close()
-    return redirect('/') if success else abort(400)
+    return jsonify({ 'success': True }) if success else abort(400)
 
 @app.route('/todos/<todo_id>', methods=['DELETE'])
 def delete(todo_id):

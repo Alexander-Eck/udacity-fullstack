@@ -47,12 +47,13 @@
         </div>
         <div id="error-msg"></div>
         <script>
+            // Handle checkbox updates
             checkboxes = document.querySelectorAll('.completed');
             for (let i=0; i<checkboxes.length; i++) {
                 checkboxes[i].onchange = function(event) {
                     const todoId = event.target.parentElement.dataset['id'];
-                    fetch('/todos/'+todoId+'/update/completed', {
-                        method: 'POST',
+                    fetch('/todos/'+todoId+'/completed', {
+                        method: 'PATCH',
                         headers: {'Content-Type':'application/json'},
                         body: JSON.stringify({
                             'completed':event.target.checked
@@ -65,6 +66,25 @@
                     });
                 }
             }
+            // Handle delete button
+            deleteButtons = document.querySelectorAll('.delete');
+            for (let i=0; i<deleteButtons.length; i++) {
+                deleteButtons[i].onclick = function(event) {
+                    const todoId = event.target.parentElement.dataset['id'];
+                    fetch('/todos/'+todoId, {
+                        method: 'DELETE'
+                    })
+                    .then(function() {
+                        event.target.parentElement.remove();
+                    })
+                    .catch(function(error) {
+                        error_div = document.getElementById('error-msg');
+                        error_div.style.display = "block";
+                        error_div.innerHTML = error;
+                    });
+                }
+            }
+            // Handle insert of new todo item
             document.getElementById('form').onsubmit = function(event) {
                 event.preventDefault();
                 fetch('/todos', {
@@ -99,23 +119,6 @@
                     error_div.style.display = "block";
                     error_div.innerHTML = error;
                 });
-            }
-            deleteButtons = document.querySelectorAll('.delete');
-            for (let i=0; i<deleteButtons.length; i++) {
-                deleteButtons[i].onclick = function(event) {
-                    const todoId = event.target.parentElement.dataset['id'];
-                    fetch('/todos/'+todoId, {
-                        method: 'DELETE'
-                    })
-                    .then(function() {
-                        event.target.parentElement.remove();
-                    })
-                    .catch(function(error) {
-                        error_div = document.getElementById('error-msg');
-                        error_div.style.display = "block";
-                        error_div.innerHTML = error;
-                    });
-                }
             }
         </script>
     </body>
