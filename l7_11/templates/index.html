@@ -1,0 +1,125 @@
+<html>
+    <head>
+        <title>Todo App</title>
+        <style>
+            #error-msg {
+                display: none;
+            }
+            ul {
+                list-style: none;
+                padding: 0;
+                margin: 15 0;
+                width: 300px;
+            }
+            li {
+                clear: both;
+                margin: 5 0;
+            }
+            li button {
+                border: none;
+                color: red;
+                background-color: white;
+                outline: none;
+                float: right;
+                cursor: pointer;
+            }
+        </style>
+    </head>
+    <body>
+        <ul id="todos">
+            {% for todo in todos %}
+            <li data-id="{{ todo.id }}">
+                <input type="checkbox" class="completed"
+                    {% if todo.completed %}checked{% endif %} />
+                {{ todo.description }}
+                <button class="delete">&cross;</button>
+            </li>
+            {% endfor %}
+        </ul>
+        <div>
+            <form id="form">
+                <label>Todo:
+                    <input required type="text" id="description" 
+                        name="description" minlength="3" />
+                </label>
+                <input type="submit" value="Add Todo" />
+            </form>
+        </div>
+        <div id="error-msg"></div>
+        <script>
+            // Handle checkbox updates
+            checkboxes = document.querySelectorAll('.completed');
+            for (let i=0; i<checkboxes.length; i++) {
+                checkboxes[i].onchange = function(event) {
+                    const todoId = event.target.parentElement.dataset['id'];
+                    fetch('/todos/'+todoId+'/completed', {
+                        method: 'PATCH',
+                        headers: {'Content-Type':'application/json'},
+                        body: JSON.stringify({
+                            'completed':event.target.checked
+                        })
+                    })
+                    .catch(function(error) {
+                        error_div = document.getElementById('error-msg');
+                        error_div.style.display = "block";
+                        error_div.innerHTML = error;
+                    });
+                }
+            }
+            // Handle delete button
+            deleteButtons = document.querySelectorAll('.delete');
+            for (let i=0; i<deleteButtons.length; i++) {
+                deleteButtons[i].onclick = function(event) {
+                    const todoId = event.target.parentElement.dataset['id'];
+                    fetch('/todos/'+todoId, {
+                        method: 'DELETE'
+                    })
+                    .then(function() {
+                        event.target.parentElement.remove();
+                    })
+                    .catch(function(error) {
+                        error_div = document.getElementById('error-msg');
+                        error_div.style.display = "block";
+                        error_div.innerHTML = error;
+                    });
+                }
+            }
+            // Handle insert of new todo item
+            document.getElementById('form').onsubmit = function(event) {
+                event.preventDefault();
+                fetch('/todos', {
+                    method: 'POST',
+                    headers: {'Content-Type':'application/json'},
+                    body: JSON.stringify({
+                        'description':document.getElementById('description').value
+                    })
+                })
+                .then(function(response) {
+                    if(!response.ok) {
+                        throw Error(response.statusText);
+                    }
+                    return response.json();
+                })
+                .then(function(response) {
+                    const li = document.createElement('li');
+                    const checkbox = document.createElement('input');
+                    checkbox.type = 'checkbox';
+                    checkbox.className = 'completed';
+                    li.appendChild(checkbox);
+                    const description = document.createTextNode(' '+response['description']);
+                    li.appendChild(description);
+                    const deleteButton = document.createElement('button');
+                    deleteButton.className = 'delete';
+                    deleteButton.innerHTML = '&cross;';
+                    li.appendChild(deleteButton);
+                    document.getElementById('todos').appendChild(li);
+                })
+                .catch(function(error) {
+                    error_div = document.getElementById('error-msg');
+                    error_div.style.display = "block";
+                    error_div.innerHTML = error;
+                });
+            }
+        </script>
+    </body>
+</html>
